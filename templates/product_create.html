@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}상품 기본정보 등록 | Panda Auction{% endblock %}
+
+{% block content %}
+  <section class="page-title">
+    <div>
+      <h1>상품 기본정보 등록</h1>
+      <p>먼저 제품 사진, 제품명, 브랜드명을 입력합니다. 다음 단계에서 시세를 확인하고 금액을 등록합니다.</p>
+    </div>
+  </section>
+
+  <ol class="step-row" aria-label="상품 등록 단계">
+    <li class="active">1. 기본정보</li>
+    <li>2. 시세확인·금액등록</li>
+  </ol>
+
+  <form class="form-panel split-form" method="post">
+    <label class="full-field">
+      <span>제품 사진 URL</span>
+      <input name="image" type="url" value="{{ draft.image if draft else '' }}" placeholder="비워두면 기본 이미지가 표시됩니다.">
+    </label>
+
+    <div class="form-grid">
+      <label>
+        <span>제품명</span>
+        <input name="name" type="text" value="{{ draft.name if draft else '' }}" required>
+      </label>
+      <label>
+        <span>브랜드명</span>
+        <input name="brand" type="text" value="{{ draft.brand if draft else '' }}" required>
+      </label>
+    </div>
+
+    <div class="market-note">
+      <strong>다음 단계</strong>
+      <span>입력한 제품명과 브랜드명을 기준으로 외부 시세를 확인한 뒤 경매시작가와 즉시구매가를 입력합니다.</span>
+    </div>
+
+    <div class="form-actions">
+      <a class="secondary-button" href="{{ url_for('product_list') }}">취소</a>
+      <button class="primary-button" type="submit">시세확인으로 이동</button>
+    </div>
+  </form>
+{% endblock %}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="headphones product">
+  <rect width="800" height="600" fill="#f8f5ec"/>
+  <path d="M220 310c0-126 78-210 180-210s180 84 180 210" fill="none" stroke="#17211b" stroke-width="42" stroke-linecap="round"/>
+  <rect x="170" y="292" width="116" height="188" rx="42" fill="#12825d"/>
+  <rect x="514" y="292" width="116" height="188" rx="42" fill="#12825d"/>
+  <rect x="204" y="322" width="52" height="128" rx="26" fill="#075d43"/>
+  <rect x="544" y="322" width="52" height="128" rx="26" fill="#075d43"/>
+</svg>

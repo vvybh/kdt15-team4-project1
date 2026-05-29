@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="bag product">
+  <rect width="800" height="600" fill="#fff4e7"/>
+  <path d="M282 236c0-68 50-116 118-116s118 48 118 116" fill="none" stroke="#74462e" stroke-width="28" stroke-linecap="round"/>
+  <rect x="206" y="218" width="388" height="276" rx="36" fill="#b96c45"/>
+  <rect x="236" y="252" width="328" height="198" rx="22" fill="#d08a5d"/>
+  <circle cx="310" cy="286" r="12" fill="#74462e"/>
+  <circle cx="490" cy="286" r="12" fill="#74462e"/>
+</svg>

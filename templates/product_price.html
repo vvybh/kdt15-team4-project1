@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}시세확인·금액등록 | Panda Auction{% endblock %}
+
+{% block content %}
+  {% set image_src = draft.image if draft.image.startswith('http') else url_for('static', filename=draft.image) %}
+  {% set suggested_start = form_data.get('start_price') or (analysis.balanced_start_price if analysis and analysis.usable_count > 0 else '') %}
+  {% set suggested_buy = form_data.get('buy_now_price') or (analysis.buy_now_price if analysis and analysis.usable_count > 0 else '') %}
+
+  <section class="page-title">
+    <div>
+      <h1>시세확인·금액등록</h1>
+      <p>상품 기본정보를 기준으로 시세를 참고하고 경매 금액을 입력합니다.</p>
+    </div>
+  </section>
+
+  <ol class="step-row" aria-label="상품 등록 단계">
+    <li>1. 기본정보</li>
+    <li class="active">2. 시세확인·금액등록</li>
+  </ol>
+
+  <section class="price-step-layout">
+    <aside class="draft-summary">
+      <img src="{{ image_src }}" alt="{{ draft.name }} 제품 사진">
+      <div>
+        <span class="status-pill">등록 예정</span>
+        <h2>{{ draft.name }}</h2>
+        <p class="muted">{{ draft.brand }}</p>
+      </div>
+      <a class="secondary-button full" href="{{ url_for('product_create') }}">기본정보 수정</a>
+    </aside>
+
+    <div class="price-step-main">
+      <section class="market-analysis">
+        <div class="section-heading">
+          <div>
+            <h2>시세 확인</h2>
+            <p class="muted">{{ keyword }} · 참고용 데이터</p>
+          </div>
+          {% if analysis %}
+            <span class="status-pill">신뢰도 {{ analysis.confidence }}</span>
+          {% endif %}
+        </div>
+
+        <form class="inline-market-form" method="get">
+          <label>
+            <span>수집처</span>
+            <select name="platform">
+              <option value="all" {% if platform == 'all' %}selected{% endif %}>전체</option>
+              <option value="joongna" {% if platform == 'joongna' %}selected{% endif %}>중고나라</option>
+              <option value="bunjang" {% if platform == 'bunjang' %}selected{% endif %}>번개장터</option>
+              <option value="daangn" {% if platform == 'daangn' %}selected{% endif %}>당근마켓</option>
+              <option value="kream" {% if platform == 'kream' %}selected{% endif %}>KREAM</option>
+            </select>
+          </label>
+          <button class="secondary-button" type="submit">시세 다시 확인</button>
+        </form>
+
+        {% if analysis_error %}
+          <div class="empty-state">{{ analysis_error }}</div>
+        {% endif %}
+
+        {% if analysis and analysis.usable_count > 0 %}
+          <div class="metric-row market-metrics" aria-label="시세 요약">
+            <article>
+              <span>최저가</span>
+              <strong>{{ analysis.min_price|won }}</strong>
+            </article>
+            <article>
+              <span>평균가</span>
+              <strong>{{ analysis.average_price|won }}</strong>
+            </article>
+            <article>
+              <span>중앙값</span>
+              <strong>{{ analysis.market_price|won }}</strong>
+            </article>
+            <article>
+              <span>최고가</span>
+              <strong>{{ analysis.max_price|won }}</strong>
+            </article>
+          </div>
+
+          <div class="analysis-gauge">
+            <span class="gauge-track">
+              <span class="gauge-fill" style="width: {{ analysis_position(analysis, 'market_price') }}%"></span>
+              <span class="gauge-pin" style="left: {{ analysis_position(analysis, 'market_price') }}%"></span>
+            </span>
+            <div class="gauge-scale">
+              <span>최저 {{ analysis.min_price|won }}</span>
+              <span>중앙 {{ analysis.market_price|won }}</span>
+              <span>최고 {{ analysis.max_price|won }}</span>
+            </div>
+          </div>
+
+          <div class="recommendation-grid">
+            <article>
+              <span>빠른 판매 시작가</span>
+              <strong>{{ analysis.quick_start_price|won }}</strong>
+            </article>
+            <article>
+              <span>균형 판매 시작가</span>
+              <strong>{{ analysis.balanced_start_price|won }}</strong>
+            </article>
+            <article>
+              <span>즉시구매 추천가</span>
+              <strong>{{ analysis.buy_now_price|won }}</strong>
+            </article>
+          </div>
+        {% else %}
+          <div class="empty-state">시세 정보 부족</div>
+        {% endif %}
+      </section>
+
+      <form class="form-panel price-form" method="post">
+        <input type="hidden" name="platform" value="{{ platform }}">
+        <div class="form-grid">
+          <label>
+            <span>경매시작가</span>
+            <input name="start_price" type="number" min="0" step="1000" value="{{ suggested_start }}" required>
+          </label>
+          <label>
+            <span>즉시구매가</span>
+            <input name="buy_now_price" type="number" min="0" step="1000" value="{{ suggested_buy }}" required>
+          </label>
+          <label>
+            <span>경매 마감 시간</span>
+            <select name="duration" required>
+              {% for duration in duration_options %}
+                <option value="{{ duration }}" {% if form_data.get('duration') == duration|string %}selected{% endif %}>{{ duration }}일</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label>
+            <span>카테고리</span>
+            <input name="category" type="text" value="{{ form_data.get('category', '') }}" placeholder="디지털, 패션, 취미">
+          </label>
+        </div>
+
+        <label class="full-field">
+          <span>상품 설명</span>
+          <textarea name="description" rows="5">{{ form_data.get('description', '') }}</textarea>
+        </label>
+
+        <div class="market-note">
+          <strong>금액 기준</strong>
+          <span>시세는 참고용입니다. 즉시구매가는 경매시작가보다 높아야 합니다.</span>
+        </div>
+
+        <div class="form-actions">
+          <a class="secondary-button" href="{{ url_for('product_create') }}">이전</a>
+          <button class="primary-button" type="submit">상품 등록 완료</button>
+        </div>
+      </form>
+    </div>
+  </section>
+{% endblock %}

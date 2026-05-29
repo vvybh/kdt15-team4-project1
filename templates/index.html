@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Panda Auction | 현재 경매{% endblock %}
+
+{% block content %}
+  <section class="dashboard-head">
+    <div>
+      <h1>현재 경매</h1>
+      <p>시세를 참고하고 입찰 또는 즉시구매로 거래하는 중고 경매 상품입니다.</p>
+    </div>
+    <div class="head-actions">
+      <a class="primary-button" href="{{ url_for('product_create') }}">상품 등록</a>
+      <a class="secondary-button" href="{{ url_for('market_price') }}">시세·인기</a>
+    </div>
+  </section>
+
+  <section class="metric-row" aria-label="경매 요약">
+    <article>
+      <span>진행 중</span>
+      <strong>{{ current_products|length }}</strong>
+    </article>
+    <article>
+      <span>마감 임박</span>
+      <strong>{{ closing_soon|length }}</strong>
+    </article>
+    <article>
+      <span>입찰 TOP</span>
+      <strong>{{ most_bid|length }}</strong>
+    </article>
+    <article>
+      <span>평균 시세 이하</span>
+      <strong>{{ bargain_products|length }}</strong>
+    </article>
+  </section>
+
+  <section class="top-rank-carousel" data-rank-slider>
+    <div class="section-heading">
+      <div>
+        <h2>TOP 순위</h2>
+        <p class="muted">마감 임박, 입찰 많은 상품, 시세보다 낮은 상품을 번갈아 보여줍니다.</p>
+      </div>
+      <div class="slider-tabs" aria-label="TOP 순위 선택">
+        {% for group in ranking_groups %}
+          <button type="button" class="{% if loop.first %}active{% endif %}" data-slide-dot="{{ loop.index0 }}">{{ group.title }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="rank-slides">
+      {% for group in ranking_groups %}
+        <article class="rank-slide {% if loop.first %}active{% endif %}" data-slide>
+          <div class="rank-slide-title">
+            <h3>{{ group.title }}</h3>
+            <span>{{ group.products|length }}개</span>
+          </div>
+
+          {% if group.products %}
+            <ol class="top-rank-list">
+              {% for product in group.products %}
+                {% set image_src = product.image if product.image.startswith('http') else url_for('static', filename=product.image) %}
+                <li>
+                  <span class="rank-number">{{ loop.index }}</span>
+                  <img src="{{ image_src }}" alt="{{ product.name }} 제품 사진">
+                  <div>
+                    <h4><a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a></h4>
+                    <p>{{ product.brand }} · {{ remaining_label(product) }} · 입찰 {{ product.bid_count }}회</p>
+                  </div>
+                  <strong>{{ product.current_bid|won }}</strong>
+                </li>
+              {% endfor %}
+            </ol>
+          {% else %}
+            <div class="empty-state">표시할 상품이 없습니다.</div>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_section with context %}
+
+{% block title %}인기 제품 | Panda Auction{% endblock %}
+
+{% block content %}
+  <section class="page-title">
+    <div>
+      <h1>인기 제품</h1>
+      <p>입찰 많은 상품, 시세보다 낮은 상품, 마감 임박 상품을 모았습니다.</p>
+    </div>
+  </section>
+
+  {{ product_section("입찰 많은 상품 TOP 10", most_bid, "입찰 많은 상품이 없습니다.") }}
+  {{ product_section("시세보다 낮은 상품 TOP 10", bargain_products, "평균 시세보다 낮은 상품이 없습니다.") }}
+  {{ product_section("마감 임박 상품", closing_soon, "마감 임박 상품이 없습니다.") }}
+{% endblock %}

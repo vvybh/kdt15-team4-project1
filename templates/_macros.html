@@ -1,0 +1,58 @@
+{% macro product_card(product) %}
+  {% set image_src = product.image if product.image.startswith('http') else url_for('static', filename=product.image) %}
+  <article class="product-card">
+    <a class="product-image" href="{{ url_for('product_detail', product_id=product.id) }}">
+      <img src="{{ image_src }}" alt="{{ product.name }} 제품 사진">
+    </a>
+    <div class="product-card-body">
+      <div class="card-eyebrow">
+        <span>{{ product.category }}</span>
+        <span class="status-pill {{ product.status|lower }}">{{ status_labels.get(product.status, product.status) }}</span>
+      </div>
+      <h3><a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a></h3>
+      <p class="muted">{{ product.brand }}</p>
+      <dl class="price-grid">
+        <div>
+          <dt>현재 입찰가</dt>
+          <dd>{{ product.current_bid|won }}</dd>
+        </div>
+        <div>
+          <dt>즉시구매가</dt>
+          <dd>{{ product.buy_now_price|won }}</dd>
+        </div>
+      </dl>
+      <div class="card-meta">
+        <span data-countdown data-end="{{ product.ends_at.isoformat() }}">{{ remaining_label(product) }}</span>
+        <span>입찰 {{ product.bid_count }}회</span>
+      </div>
+      {% if has_market_data(product) %}
+        <div class="mini-gauge" aria-label="시세 게이지">
+          <span class="gauge-track">
+            <span class="gauge-fill" style="width: {{ market_position(product) }}%"></span>
+            <span class="gauge-pin" style="left: {{ market_position(product) }}%"></span>
+          </span>
+          <span class="gauge-caption">참고용 시세 평균 {{ product.market.avg|won }}</span>
+        </div>
+      {% else %}
+        <p class="no-market">시세 정보 부족</p>
+      {% endif %}
+    </div>
+  </article>
+{% endmacro %}
+
+{% macro product_section(title, products, empty_text) %}
+  <section class="content-section">
+    <div class="section-heading">
+      <h2>{{ title }}</h2>
+    </div>
+    {% if products %}
+      <div class="product-grid">
+        {% for product in products %}
+          {{ product_card(product) }}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">{{ empty_text }}</div>
+    {% endif %}
+  </section>
+{% endmacro %}

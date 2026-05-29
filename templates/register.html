@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}회원가입 | Panda Auction{% endblock %}
+
+{% block content %}
+  <section class="auth-panel">
+    <h1>회원가입</h1>
+    <form method="post">
+      <label>
+        <span>아이디</span>
+        <input name="username" type="text" autocomplete="username" required>
+      </label>
+      <label>
+        <span>비밀번호</span>
+        <input name="password" type="password" autocomplete="new-password" required>
+      </label>
+      <button class="primary-button full" type="submit">회원가입</button>
+    </form>
+  </section>
+{% endblock %}
