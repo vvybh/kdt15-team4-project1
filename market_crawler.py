@@ -12,6 +12,8 @@ from typing import Any
 import requests
 from bs4 import BeautifulSoup
 
+from image_fallback import ensure_product_images
+
 
 @dataclass
 class ProductItem:
@@ -330,6 +332,7 @@ class IntegratedScraper:
         if platform in ["all", "kream"]:
             results.extend(search_kream(keyword, page, limit_per_platform, self.headers, self.session))
 
+        results = ensure_product_images(results)
         results.sort(key=lambda item: item["price"] if item["price"] > 0 else 999999999)
         return results
 

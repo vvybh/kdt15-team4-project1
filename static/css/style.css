@@ -1056,13 +1056,21 @@ tr:last-child td {
 
 .crawler-item {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: 58px auto minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #f8fbf9;
+}
+
+.crawler-thumb {
+  width: 58px;
+  height: 58px;
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  object-fit: cover;
 }
 
 .crawler-item strong {

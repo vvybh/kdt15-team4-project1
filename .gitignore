@@ -10,4 +10,5 @@ instance/
 *.sqlite
 *.sqlite3
 .env
+*.log
 .DS_Store
