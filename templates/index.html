@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}메인 - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="hero-dashboard">
+    <div class="hero-copy">
+        <p class="eyebrow">경매 웹사이트 데모</p>
+        <h1>중고 물품을 경매로 등록하고 시세 그래프로 가격을 판단합니다.</h1>
+        <p class="muted">웹사이트는 저장된 SQLite 데이터를 읽습니다. 발표 시연에서는 등록, 입찰, 낙찰, 관리자 검수 흐름을 한 번에 보여줍니다.</p>
+        <div class="actions">
+            <a class="button primary" href="{{ url_for('auction_new') }}">물품 등록</a>
+            <a class="button secondary" href="{{ url_for('auction_list') }}">경매 보기</a>
+        </div>
+    </div>
+
+    <div class="demo-flow-panel">
+        <h2>시연 흐름</h2>
+        <ol class="flow-list">
+            <li><span>1</span><strong>판매 등록</strong><small>시세 확인 후 시작가 설정</small></li>
+            <li><span>2</span><strong>입찰 참여</strong><small>현재가와 시세 비교</small></li>
+            <li><span>3</span><strong>낙찰 확인</strong><small>마감 후 최고가 확인</small></li>
+            <li><span>4</span><strong>관리자 검수</strong><small>물품 수령, 검수, 발송 상태 표시</small></li>
+        </ol>
+    </div>
+</section>
+
+<section class="metrics-grid" aria-label="데모 요약">
+    <div class="metric-card">
+        <span>대표 상품</span>
+        <strong>{{ products|length }}개</strong>
+        <small>저장 데이터 기준</small>
+    </div>
+    <div class="metric-card">
+        <span>경매 물품</span>
+        <strong>{{ auctions|length }}개</strong>
+        <small>최근 등록 순</small>
+    </div>
+    <div class="metric-card">
+        <span>거래 방식</span>
+        <strong>검수 중개</strong>
+        <small>관리자가 물품 확인 후 전달</small>
+    </div>
+</section>
+
+<section class="grid two dashboard-grid">
+    <div class="panel">
+        <div class="section-title">
+            <h2>진행 중인 경매</h2>
+            <a href="{{ url_for('auction_list') }}">전체 보기</a>
+        </div>
+        {% if auctions %}
+            <div class="auction-list compact">
+                {% for auction in auctions %}
+                    <a class="auction-row" href="{{ url_for('auction_detail', auction_id=auction.id) }}">
+                        <span>
+                            <strong>{{ auction.title }}</strong>
+                            <small>{{ auction.category }} · {{ auction.status_label }}</small>
+                        </span>
+                        <b>{{ auction.current_price|money }}</b>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty">등록된 경매가 없습니다.</p>
+        {% endif %}
+    </div>
+
+    <div class="panel">
+        <div class="section-title">
+            <h2>시세 확인</h2>
+            <a href="{{ url_for('market_check') }}">자세히 보기</a>
+        </div>
+        {% if products %}
+            <div class="chart-widget"
+                 data-product-key="{{ products[0].product_key }}"
+                 data-current-bid="">
+                <canvas class="market-chart" height="220"></canvas>
+                <div class="market-summary"></div>
+            </div>
+        {% else %}
+            <p class="empty">시세 데이터가 없습니다. 샘플 CSV를 먼저 SQLite에 넣어 주세요.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

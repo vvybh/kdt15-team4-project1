@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}물품 등록 - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <p class="eyebrow">판매 등록</p>
+    <h1>시세를 확인하고 경매 시작가를 정합니다.</h1>
+</section>
+
+<section class="grid two align-start">
+    <form class="panel form" method="post">
+        <label>물품명
+            <input name="title" value="{{ form.get('title', '') }}" required>
+        </label>
+        <label>정리한 상품명
+            <input name="product_name" value="{{ form.get('product_name', '') }}" placeholder="예: 나이키 후드티">
+        </label>
+        <div class="form-grid">
+            <label>카테고리
+                <input name="category" value="{{ form.get('category', '') }}" required>
+            </label>
+            <label>브랜드
+                <input name="brand" value="{{ form.get('brand', '') }}">
+            </label>
+        </div>
+        <label>시세 비교 상품
+            <select name="product_key" id="product-key-select" required>
+                {% for product in products %}
+                    <option value="{{ product.product_key }}" {% if product.product_key == selected_key %}selected{% endif %}>
+                        {{ product.product_name }} · {{ product.sample_count }}건
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+        <div class="form-grid">
+            <label>판매자 이름
+                <input name="seller_name" value="{{ form.get('seller_name', '') }}" required>
+            </label>
+            <label>모델명
+                <input name="model_name" value="{{ form.get('model_name', '') }}">
+            </label>
+        </div>
+        <div class="form-grid">
+            <label>시작가
+                <input name="start_price" type="number" min="0" step="100" value="{{ form.get('start_price', '') }}" required>
+            </label>
+            <label>입찰 단위
+                <input name="bid_unit" type="number" min="100" step="100" value="{{ form.get('bid_unit', '1000') }}">
+            </label>
+        </div>
+        <label>마감 시간
+            <input name="end_at" type="datetime-local" value="{{ form.get('end_at', '') }}" required>
+        </label>
+        <div class="form-grid">
+            <label>상품 상태
+                <select name="item_condition">
+                    {% for condition in ["새상품", "거의 새것", "사용감 적음", "사용감 있음", "하자 있음", "상태 확인 필요"] %}
+                        <option value="{{ condition }}" {% if form.get('item_condition') == condition %}selected{% endif %}>{{ condition }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>구성품
+                <input name="components" value="{{ form.get('components', '단품') }}">
+            </label>
+        </div>
+        <label>이미지 주소
+            <input name="image_url" value="{{ form.get('image_url', '') }}" placeholder="https://...">
+        </label>
+        <label>설명
+            <textarea name="description" rows="5">{{ form.get('description', '') }}</textarea>
+        </label>
+        <button class="button primary full" type="submit">경매 등록</button>
+    </form>
+
+    <aside class="panel sticky">
+        <h2>시세 참고</h2>
+        {% if products %}
+            <div class="chart-widget"
+                 id="register-chart"
+                 data-product-key="{{ selected_key }}"
+                 data-current-bid="">
+                <canvas class="market-chart" height="240"></canvas>
+                <div class="market-summary"></div>
+            </div>
+        {% else %}
+            <p class="empty">시세 데이터가 없습니다.</p>
+        {% endif %}
+    </aside>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const productSelect = document.querySelector("#product-key-select");
+const chartWidget = document.querySelector("#register-chart");
+if (productSelect && chartWidget) {
+    productSelect.addEventListener("change", () => {
+        chartWidget.dataset.productKey = productSelect.value;
+        window.renderMarketWidget(chartWidget);
+    });
+}
+</script>
+{% endblock %}

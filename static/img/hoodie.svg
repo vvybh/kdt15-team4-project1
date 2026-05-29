@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="hoodie sample image">
+  <rect width="900" height="620" fill="#eef2f7"/>
+  <rect x="110" y="78" width="680" height="464" rx="20" fill="#ffffff"/>
+  <path d="M330 190c0-72 54-118 120-118s120 46 120 118v36h-58v-36c0-38-26-62-62-62s-62 24-62 62v36h-58z" fill="#1f2937"/>
+  <path d="M236 236c34-42 80-64 136-64h156c56 0 102 22 136 64l84 104-82 72-58-70v180H296V342l-58 70-82-72z" fill="#2f3a4a"/>
+  <path d="M362 260h176v262H362z" fill="#374151"/>
+  <path d="M392 324h116v72H392z" fill="#111827" opacity=".28"/>
+  <text x="450" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#20242a">NIKE HOODIE SAMPLE</text>
+</svg>

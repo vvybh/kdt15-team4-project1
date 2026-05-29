@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}시세 확인 - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <p class="eyebrow">가격 참고 정보</p>
+    <h1>저장된 데이터로 시세 그래프를 확인합니다.</h1>
+    <p class="muted">최신 데이터가 없으면 최근 수집 데이터 기준으로 표시합니다.</p>
+</section>
+
+<section class="panel">
+    {% if products %}
+        <form class="inline-form" method="get">
+            <label for="product_key">대표 상품</label>
+            <select id="product_key" name="product_key" onchange="this.form.submit()">
+                {% for product in products %}
+                    <option value="{{ product.product_key }}" {% if product.product_key == selected_key %}selected{% endif %}>
+                        {{ product.product_name }} · {{ product.sample_count }}건
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+
+        <div class="chart-widget wide"
+             data-product-key="{{ selected_key }}"
+             data-current-bid="">
+            <canvas class="market-chart" height="260"></canvas>
+            <div class="market-summary"></div>
+            <div class="market-table"></div>
+        </div>
+    {% else %}
+        <p class="empty">시세 데이터가 없습니다.</p>
+    {% endif %}
+</section>
+{% endblock %}

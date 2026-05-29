@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}관리자 검수 - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <p class="eyebrow">관리자</p>
+    <h1>낙찰 뒤 검수 상태를 관리합니다.</h1>
+</section>
+
+<section class="panel">
+    {% if rows %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>물품</th>
+                        <th>낙찰자</th>
+                        <th>낙찰가</th>
+                        <th>상태 변경</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>
+                                <strong>{{ row.title }}</strong>
+                                <small>수정 {{ row.updated_at }}</small>
+                            </td>
+                            <td>{{ row.winner_name }}</td>
+                            <td>{{ row.winning_bid|money }}</td>
+                            <td>
+                                <form class="admin-form" method="post">
+                                    <input type="hidden" name="auction_id" value="{{ row.auction_id }}">
+                                    <select name="status">
+                                        {% for status in statuses %}
+                                            <option value="{{ status }}" {% if row.status == status %}selected{% endif %}>{{ status }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <input name="note" value="{{ row.note or '' }}" placeholder="검수 메모">
+                                    <button class="button primary" type="submit">저장</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty">검수할 낙찰 물품이 없습니다.</p>
+    {% endif %}
+</section>
+{% endblock %}

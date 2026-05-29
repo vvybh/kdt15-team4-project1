@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}낙찰 결과 - {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <p class="eyebrow">낙찰 결과</p>
+    <h1>{{ auction.title }}</h1>
+</section>
+
+<section class="grid two align-start">
+    <div class="panel">
+        <h2>경매 결과</h2>
+        <dl class="info-list large">
+            <div><dt>상태</dt><dd>{{ auction.status_label }}</dd></div>
+            <div><dt>낙찰자</dt><dd>{{ auction.winner_name or "-" }}</dd></div>
+            <div><dt>낙찰가</dt><dd>{{ auction.winning_bid|money }}</dd></div>
+            <div><dt>마감 시간</dt><dd>{{ auction.end_at }}</dd></div>
+        </dl>
+        <a class="button secondary" href="{{ url_for('auction_detail', auction_id=auction.id) }}">상세로 돌아가기</a>
+    </div>
+
+    <div class="panel">
+        <h2>관리자 검수 흐름</h2>
+        {% if auction.status == "active" %}
+            <p class="empty">경매가 아직 진행 중입니다.</p>
+        {% elif inspection %}
+            <div class="status-timeline">
+                {% for label in ["판매자 발송 대기", "관리자 수령 완료", "검수 중", "검수 통과", "검수 보류", "검수 실패", "구매자 발송 완료"] %}
+                    <div class="timeline-item {% if inspection.status == label %}current{% endif %}">
+                        <span></span>
+                        <p>{{ label }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+            <p class="muted">현재 상태: {{ inspection.status }}</p>
+            {% if inspection.note %}<p>{{ inspection.note }}</p>{% endif %}
+        {% else %}
+            <p class="empty">검수 대상이 없습니다.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

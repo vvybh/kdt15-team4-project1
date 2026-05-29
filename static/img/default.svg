@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="auction sample image">
+  <rect width="900" height="620" fill="#eef2f7"/>
+  <rect x="130" y="100" width="640" height="420" rx="18" fill="#ffffff"/>
+  <path d="M270 382h360" stroke="#13795b" stroke-width="26" stroke-linecap="round"/>
+  <path d="M324 302h252" stroke="#2563eb" stroke-width="26" stroke-linecap="round"/>
+  <path d="M378 222h144" stroke="#dc2626" stroke-width="26" stroke-linecap="round"/>
+  <text x="450" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#20242a">AUCTION SAMPLE</text>
+</svg>
