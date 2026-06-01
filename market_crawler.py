@@ -12,7 +12,11 @@ from typing import Any
 import requests
 from bs4 import BeautifulSoup
 
+from bunjang_scraper import search_bunjang as fetch_bunjang
+from daangn_scraper import search_daangn as fetch_daangn
 from image_fallback import ensure_product_images
+from joongna_scraper import search_joongna as fetch_joongna
+from kream_scraper import search_kream as fetch_kream
 
 
 @dataclass
@@ -324,13 +328,13 @@ class IntegratedScraper:
         results: list[dict[str, Any]] = []
 
         if platform in ["all", "joongna"]:
-            results.extend(search_joongna(keyword, page, limit_per_platform, self.headers, self.session))
+            results.extend(fetch_joongna(keyword, page, limit_per_platform, self.headers, self.session))
         if platform in ["all", "bunjang"]:
-            results.extend(search_bunjang(keyword, page, limit_per_platform, self.headers, self.session))
+            results.extend(fetch_bunjang(keyword, page, limit_per_platform, self.headers, self.session))
         if platform in ["all", "daangn"]:
-            results.extend(search_daangn(keyword, page, limit_per_platform, self.headers, self.session))
+            results.extend(fetch_daangn(keyword, page, limit_per_platform, self.headers, self.session))
         if platform in ["all", "kream"]:
-            results.extend(search_kream(keyword, page, limit_per_platform, self.headers, self.session))
+            results.extend(fetch_kream(keyword, page, limit_per_platform, self.headers, self.session))
 
         results = ensure_product_images(results)
         results.sort(key=lambda item: item["price"] if item["price"] > 0 else 999999999)
