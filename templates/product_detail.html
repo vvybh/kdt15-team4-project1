@@ -3,10 +3,9 @@
 {% block title %}{{ product.name }} | Panda Auction{% endblock %}
 
 {% block content %}
-  {% set image_src = product.image if product.image.startswith('http') else url_for('static', filename=product.image) %}
   <section class="detail-layout">
     <div class="detail-media">
-      <img src="{{ image_src }}" alt="{{ product.name }} 제품 사진">
+      <img src="{{ display_product_photo(product) }}" alt="{{ product.name }} 제품 사진">
     </div>
 
     <article class="detail-main">

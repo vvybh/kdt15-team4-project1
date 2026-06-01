@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 
+from image_fallback import guess_product_photo, normalize_image_url
 from market_crawler import analyze_market
 
 
@@ -196,6 +197,32 @@ def has_market_data(product):
     return all(market.get(key) for key in ("low", "avg", "high")) and market["high"] > market["low"]
 
 
+def display_product_photo(product):
+    custom_image = normalize_image_url(product.get("image", ""))
+    if custom_image:
+        return custom_image
+
+    searchable_title = " ".join(
+        str(part)
+        for part in [product.get("brand", ""), product.get("name", ""), product.get("category", "")]
+        if part
+    )
+    return guess_product_photo(searchable_title)
+
+
+def display_draft_photo(draft):
+    custom_image = normalize_image_url(draft.get("image", ""))
+    if custom_image:
+        return custom_image
+
+    searchable_title = " ".join(
+        str(part)
+        for part in [draft.get("brand", ""), draft.get("name", "")]
+        if part
+    )
+    return guess_product_photo(searchable_title)
+
+
 def market_position(product, value=None):
     if not has_market_data(product):
         return 50
@@ -355,6 +382,8 @@ def inject_template_helpers():
         "active_product": active_product,
         "analysis_position": analysis_position,
         "below_market": below_market,
+        "display_draft_photo": display_draft_photo,
+        "display_product_photo": display_product_photo,
         "duration_options": DURATION_OPTIONS,
         "has_market_data": has_market_data,
         "market_position": market_position,

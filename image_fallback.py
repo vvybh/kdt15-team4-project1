@@ -43,6 +43,10 @@ PRODUCT_PHOTO_RULES: list[tuple[tuple[str, ...], str]] = [
         "https://images.unsplash.com/photo-1505740420928-5e560c06d30e" + PHOTO_SIZE_QUERY,
     ),
     (
+        ("턴테이블", "레코드", "lp", "turntable", "vinyl"),
+        "https://images.unsplash.com/photo-1461360370896-922624d12aa1" + PHOTO_SIZE_QUERY,
+    ),
+    (
         ("카메라", "렌즈", "dslr", "미러리스", "camera"),
         "https://images.unsplash.com/photo-1516035069371-29a1b244cc32" + PHOTO_SIZE_QUERY,
     ),

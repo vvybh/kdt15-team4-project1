@@ -1,8 +1,7 @@
 {% macro product_card(product) %}
-  {% set image_src = product.image if product.image.startswith('http') else url_for('static', filename=product.image) %}
   <article class="product-card">
     <a class="product-image" href="{{ url_for('product_detail', product_id=product.id) }}">
-      <img src="{{ image_src }}" alt="{{ product.name }} 제품 사진">
+      <img src="{{ display_product_photo(product) }}" alt="{{ product.name }} 제품 사진">
     </a>
     <div class="product-card-body">
       <div class="card-eyebrow">

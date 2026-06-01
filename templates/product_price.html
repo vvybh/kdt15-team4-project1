@@ -3,7 +3,6 @@
 {% block title %}시세확인·금액등록 | Panda Auction{% endblock %}
 
 {% block content %}
-  {% set image_src = draft.image if draft.image.startswith('http') else url_for('static', filename=draft.image) %}
   {% set suggested_start = form_data.get('start_price') or (analysis.balanced_start_price if analysis and analysis.usable_count > 0 else '') %}
   {% set suggested_buy = form_data.get('buy_now_price') or (analysis.buy_now_price if analysis and analysis.usable_count > 0 else '') %}
 
@@ -21,7 +20,7 @@
 
   <section class="price-step-layout">
     <aside class="draft-summary">
-      <img src="{{ image_src }}" alt="{{ draft.name }} 제품 사진">
+      <img src="{{ display_draft_photo(draft) }}" alt="{{ draft.name }} 제품 사진">
       <div>
         <span class="status-pill">등록 예정</span>
         <h2>{{ draft.name }}</h2>

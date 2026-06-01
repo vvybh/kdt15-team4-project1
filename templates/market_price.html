@@ -225,6 +225,7 @@
               {% for product in group.products %}
                 <li>
                   <span class="rank-number">{{ loop.index }}</span>
+                  <img src="{{ display_product_photo(product) }}" alt="{{ product.name }} 제품 사진" loading="lazy">
                   <div>
                     <a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a>
                     <p>{{ product.brand }} · 입찰 {{ product.bid_count }}회</p>
