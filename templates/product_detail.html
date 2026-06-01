@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} | Panda Auction{% endblock %}
+
+{% block content %}
+  <section class="detail-layout">
+    <div class="detail-media">
+      <img src="{{ display_product_photo(product) }}" alt="{{ product.name }} 제품 사진">
+    </div>
+
+    <article class="detail-main">
+      <div class="detail-topline">
+        <span>{{ product.category }}</span>
+        <span class="status-pill {{ product.status|lower }}">{{ status_labels.get(product.status, product.status) }}</span>
+      </div>
+      <h1>{{ product.name }}</h1>
+      <p class="muted">{{ product.brand }} · 판매자 {{ product.seller }}</p>
+
+      <dl class="detail-prices">
+        <div>
+          <dt>현재 입찰가</dt>
+          <dd>{{ product.current_bid|won }}</dd>
+        </div>
+        <div>
+          <dt>즉시구매가</dt>
+          <dd>{{ product.buy_now_price|won }}</dd>
+        </div>
+        <div>
+          <dt>입찰 수</dt>
+          <dd>{{ product.bid_count }}회</dd>
+        </div>
+        <div>
+          <dt>남은 시간</dt>
+          <dd data-countdown data-end="{{ product.ends_at.isoformat() }}">{{ remaining_label(product) }}</dd>
+        </div>
+      </dl>
+
+      <section class="market-panel">
+        <div class="section-heading compact-heading">
+          <h2>시세 게이지</h2>
+          <span>참고용</span>
+        </div>
+        {% if has_market_data(product) %}
+          <div class="wide-gauge">
+            <span class="gauge-track">
+              <span class="gauge-fill" style="width: {{ market_position(product) }}%"></span>
+              <span class="gauge-pin" style="left: {{ market_position(product) }}%"></span>
+            </span>
+            <div class="gauge-scale">
+              <span>최저 {{ product.market.low|won }}</span>
+              <span>평균 {{ product.market.avg|won }}</span>
+              <span>최고 {{ product.market.high|won }}</span>
+            </div>
+          </div>
+        {% else %}
+          <div class="empty-state small">시세 정보 부족</div>
+        {% endif %}
+      </section>
+
+      <section class="description-block">
+        <h2>상품 설명</h2>
+        <p>{{ product.description }}</p>
+      </section>
+    </article>
+
+    <aside class="bid-panel">
+      {% if active_product(product) %}
+        <form action="{{ url_for('place_bid', product_id=product.id) }}" method="post">
+          <h2>입찰</h2>
+          <label>
+            <span>입찰자</span>
+            <input name="bidder" type="text" value="{{ session.get('username', '') }}" placeholder="이름">
+          </label>
+          <label>
+            <span>입찰 금액</span>
+            <input name="bid_price" type="number" min="{{ min_bid }}" step="1000" value="{{ min_bid }}">
+          </label>
+          <button class="primary-button full" type="submit">입찰하기</button>
+        </form>
+
+        <form action="{{ url_for('buy_now', product_id=product.id) }}" method="post">
+          <input name="buyer" type="hidden" value="{{ session.get('username', '') }}">
+          <button class="buy-button full" type="submit">즉시구매 {{ product.buy_now_price|won }}</button>
+        </form>
+      {% else %}
+        <div class="closed-panel">
+          <h2>{{ status_labels.get(product.status, product.status) }}</h2>
+          <p>구매자 상태: {{ product.buyer_state }}</p>
+          <p>판매자 상태: {{ product.seller_state }}</p>
+        </div>
+      {% endif %}
+
+      <div class="transaction-card">
+        <h2>거래 상태</h2>
+        <ol class="status-list">
+          <li class="{% if product.status == 'BIDDING' %}active{% endif %}">BIDDING</li>
+          <li class="{% if product.status == 'PAYMENT_WAITING' %}active{% endif %}">PAYMENT_WAITING</li>
+          <li>SELLER_SHIPPING</li>
+          <li>INSPECTION_WAITING</li>
+          <li>COMPLETED</li>
+        </ol>
+      </div>
+    </aside>
+  </section>
+
+  <section class="content-section">
+    <div class="section-heading">
+      <h2>입찰 내역</h2>
+    </div>
+    {% if product.bids %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>입찰자</th>
+              <th>금액</th>
+              <th>시간</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for bid in product.bids %}
+              <tr>
+                <td>{{ bid.bidder }}</td>
+                <td>{{ bid.amount|won }}</td>
+                <td>{{ bid.time|time_text }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">아직 입찰 내역이 없습니다.</div>
+    {% endif %}
+  </section>
+{% endblock %}

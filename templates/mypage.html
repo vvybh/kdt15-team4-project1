@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_card with context %}
+
+{% block title %}마이페이지 | Panda Auction{% endblock %}
+
+{% block content %}
+  <section class="page-title">
+    <div>
+      <h1>마이페이지</h1>
+      <p>{{ username }}님의 거래 현황입니다.</p>
+    </div>
+  </section>
+
+  <section class="metric-row" aria-label="내 정보">
+    <article>
+      <span>포인트</span>
+      <strong>{{ points|won }}</strong>
+    </article>
+    <article>
+      <span>경고 횟수</span>
+      <strong>{{ warning_count }}회</strong>
+    </article>
+    <article>
+      <span>등록 상품</span>
+      <strong>{{ my_listings|length }}</strong>
+    </article>
+    <article>
+      <span>입찰 상품</span>
+      <strong>{{ my_bids|length }}</strong>
+    </article>
+  </section>
+
+  <section class="content-section">
+    <div class="section-heading">
+      <h2>내가 등록한 상품</h2>
+    </div>
+    {% if my_listings %}
+      <div class="product-grid">
+        {% for product in my_listings %}
+          {{ product_card(product) }}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">등록한 상품이 없습니다.</div>
+    {% endif %}
+  </section>
+
+  <section class="content-section">
+    <div class="section-heading">
+      <h2>내가 입찰한 상품</h2>
+    </div>
+    {% if my_bids %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>상품</th>
+              <th>현재 상태</th>
+              <th>구매자 상태</th>
+              <th>판매자 상태</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in my_bids %}
+              <tr>
+                <td><a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a></td>
+                <td>{{ status_labels.get(product.status, product.status) }}</td>
+                <td>{{ product.buyer_state }}</td>
+                <td>{{ product.seller_state }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">입찰한 상품이 없습니다.</div>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}시세·인기 | Panda Auction{% endblock %}
+
+{% block content %}
+  <section class="page-title">
+    <div>
+      <h1>시세·인기</h1>
+      <p>시세를 확인하고 자주 조회된 제품과 인기 경매 상품을 함께 봅니다.</p>
+    </div>
+  </section>
+
+  <form class="filter-bar market-filter" method="get">
+    <label>
+      <span>제품명</span>
+      <input name="q" type="search" value="{{ query }}" placeholder="예: 아이폰 15 Pro">
+    </label>
+    <label>
+      <span>브랜드명</span>
+      <input name="brand" type="search" value="{{ brand }}" placeholder="예: Apple">
+    </label>
+    <label>
+      <span>수집처</span>
+      <select name="platform">
+        <option value="all" {% if platform == 'all' %}selected{% endif %}>전체</option>
+        <option value="joongna" {% if platform == 'joongna' %}selected{% endif %}>중고나라</option>
+        <option value="bunjang" {% if platform == 'bunjang' %}selected{% endif %}>번개장터</option>
+        <option value="daangn" {% if platform == 'daangn' %}selected{% endif %}>당근마켓</option>
+        <option value="kream" {% if platform == 'kream' %}selected{% endif %}>KREAM</option>
+      </select>
+    </label>
+    <button class="primary-button" type="submit">조회</button>
+  </form>
+
+  <section class="query-rank-panel">
+    <div class="section-heading">
+      <div>
+        <h2>자주 조회된 제품</h2>
+        <p class="muted">현재 실행 중인 서비스에서 시세 조회가 많았던 검색어 순위입니다.</p>
+      </div>
+    </div>
+
+    {% if query_rankings %}
+      <ol class="query-rank-list">
+        {% for item in query_rankings %}
+          <li>
+            <span class="rank-number">{{ item.rank }}</span>
+            <a href="{{ url_for('market_price', q=item.keyword) }}">{{ item.keyword }}</a>
+            <strong>{{ item.count }}회</strong>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <div class="empty-state small">아직 조회된 제품이 없습니다.</div>
+    {% endif %}
+  </section>
+
+  {% if query or brand %}
+    {% if analysis_error %}
+      <div class="empty-state">{{ analysis_error }}</div>
+    {% endif %}
+
+    {% if analysis %}
+      <section class="market-analysis">
+        <div class="section-heading">
+          <div>
+            <h2>크롤링 시세 분석</h2>
+            <p class="muted">{{ analysis.keyword }} · {{ analysis.category }} · 참고용 데이터</p>
+          </div>
+          <span class="status-pill">신뢰도 {{ analysis.confidence }}</span>
+        </div>
+
+        {% if analysis.usable_count > 0 %}
+          <div class="metric-row market-metrics" aria-label="크롤링 시세 요약">
+            <article>
+              <span>최저가</span>
+              <strong>{{ analysis.min_price|won }}</strong>
+            </article>
+            <article>
+              <span>평균가</span>
+              <strong>{{ analysis.average_price|won }}</strong>
+            </article>
+            <article>
+              <span>중앙값</span>
+              <strong>{{ analysis.market_price|won }}</strong>
+            </article>
+            <article>
+              <span>최고가</span>
+              <strong>{{ analysis.max_price|won }}</strong>
+            </article>
+          </div>
+
+          <div class="analysis-gauge">
+            <span class="gauge-track">
+              <span class="gauge-fill" style="width: {{ analysis_position(analysis, 'market_price') }}%"></span>
+              <span class="gauge-pin" style="left: {{ analysis_position(analysis, 'market_price') }}%"></span>
+            </span>
+            <div class="gauge-scale">
+              <span>최저 {{ analysis.min_price|won }}</span>
+              <span>중앙 {{ analysis.market_price|won }}</span>
+              <span>최고 {{ analysis.max_price|won }}</span>
+            </div>
+          </div>
+
+          <div class="recommendation-grid">
+            <article>
+              <span>빠른 판매 시작가</span>
+              <strong>{{ analysis.quick_start_price|won }}</strong>
+            </article>
+            <article>
+              <span>균형 판매 시작가</span>
+              <strong>{{ analysis.balanced_start_price|won }}</strong>
+            </article>
+            <article>
+              <span>즉시구매 추천가</span>
+              <strong>{{ analysis.buy_now_price|won }}</strong>
+            </article>
+          </div>
+
+          <div class="market-note">
+            <strong>참고용 시세</strong>
+            <span>{{ analysis.seller_message }}</span>
+          </div>
+
+          {% if analysis.platform_summary %}
+            <div class="table-wrap market-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>수집처</th>
+                    <th>건수</th>
+                    <th>중앙값</th>
+                    <th>최저가</th>
+                    <th>최고가</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for name, summary in analysis.platform_summary.items() %}
+                    <tr>
+                      <td>{{ name }}</td>
+                      <td>{{ summary.count }}개</td>
+                      <td>{{ summary.median|won }}</td>
+                      <td>{{ summary.min|won }}</td>
+                      <td>{{ summary.max|won }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+
+          {% if analysis.sample_items %}
+            <section class="content-section">
+              <div class="section-heading">
+                <h2>수집된 유사 상품</h2>
+              </div>
+              <div class="crawler-items">
+                {% for item in analysis.sample_items %}
+                  <a class="crawler-item" href="{{ item.link }}" target="_blank" rel="noreferrer">
+                    <img class="crawler-thumb" src="{{ item.image }}" alt="{{ item.title }} 상품 사진" loading="lazy">
+                    <span class="status-pill">{{ item.platform }}</span>
+                    <strong>{{ item.title }}</strong>
+                    <span>{{ item.price|won }}</span>
+                  </a>
+                {% endfor %}
+              </div>
+            </section>
+          {% endif %}
+        {% else %}
+          <div class="empty-state">시세 정보 부족</div>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    {% if results %}
+      <section class="content-section">
+        <div class="section-heading">
+          <h2>현재 등록 상품과 비교</h2>
+        </div>
+      <div class="market-list">
+        {% for product in results %}
+          <article class="market-result">
+            <div>
+              <h2><a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a></h2>
+              <p class="muted">{{ product.brand }} · 현재 경매가 {{ product.current_bid|won }}</p>
+            </div>
+            {% if has_market_data(product) %}
+              <div class="wide-gauge">
+                <span class="gauge-track">
+                  <span class="gauge-fill" style="width: {{ market_position(product) }}%"></span>
+                  <span class="gauge-pin" style="left: {{ market_position(product) }}%"></span>
+                </span>
+                <div class="gauge-scale">
+                  <span>최저 {{ product.market.low|won }}</span>
+                  <span>평균 {{ product.market.avg|won }}</span>
+                  <span>최고 {{ product.market.high|won }}</span>
+                </div>
+              </div>
+            {% else %}
+              <div class="empty-state small">시세 정보 부족</div>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+      </section>
+    {% elif not analysis or analysis.usable_count == 0 %}
+      <div class="empty-state">시세 정보 부족</div>
+    {% endif %}
+  {% endif %}
+
+  <section id="popular-rankings" class="content-section">
+    <div class="section-heading">
+      <div>
+        <h2>인기 제품 순위</h2>
+        <p class="muted">입찰 많은 상품, 시세보다 낮은 상품, 마감 임박 상품을 한곳에서 확인합니다.</p>
+      </div>
+    </div>
+
+    <div class="popular-rank-grid">
+      {% for group in popular_groups %}
+        <article class="popular-rank-card">
+          <h3>{{ group.title }}</h3>
+          {% if group.products %}
+            <ol>
+              {% for product in group.products %}
+                <li>
+                  <span class="rank-number">{{ loop.index }}</span>
+                  <img src="{{ display_product_photo(product) }}" alt="{{ product.name }} 제품 사진" loading="lazy">
+                  <div>
+                    <a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a>
+                    <p>{{ product.brand }} · 입찰 {{ product.bid_count }}회</p>
+                  </div>
+                  <strong>{{ product.current_bid|won }}</strong>
+                </li>
+              {% endfor %}
+            </ol>
+          {% else %}
+            <div class="empty-state small">표시할 상품이 없습니다.</div>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Panda Auction{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="{{ url_for('index') }}" aria-label="Panda Auction 홈">
+        <span class="brand-mark">PA</span>
+        <span class="brand-name">Panda Auction</span>
+      </a>
+
+      <form class="top-search" action="{{ url_for('product_list') }}" method="get">
+        <label class="sr-only" for="global-search">상품 검색</label>
+        <input id="global-search" name="q" type="search" placeholder="제품명, 브랜드명, 카테고리 검색" value="{{ request.args.get('q', '') }}">
+        <button type="submit">검색</button>
+      </form>
+
+      <nav class="nav-links" aria-label="주요 메뉴">
+        <a href="{{ url_for('product_list') }}">현재 경매</a>
+        <a href="{{ url_for('market_price') }}">시세·인기</a>
+        {% if session.get('is_authenticated') %}
+          <a href="{{ url_for('mypage') }}">마이페이지</a>
+        {% endif %}
+      </nav>
+
+      <div class="auth-actions">
+        {% if session.get('is_authenticated') %}
+          <span class="user-chip">{{ session.get('username') }}</span>
+          <form action="{{ url_for('logout') }}" method="post">
+            <button class="ghost-button" type="submit">로그아웃</button>
+          </form>
+        {% else %}
+          <a class="ghost-button" href="{{ url_for('login') }}">로그인</a>
+          <a class="primary-button compact" href="{{ url_for('register') }}">회원가입</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack" role="status" aria-live="polite">
+          {% for category, message in messages %}
+            <p class="flash {{ category }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
